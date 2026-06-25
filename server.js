@@ -10,10 +10,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const db = new Database('./database.db');
 
-// Включаем WAL режим для лучшей производительности
 db.pragma('journal_mode = WAL');
 
-// Создание таблиц
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'teacher', name TEXT, phone TEXT DEFAULT '', notes TEXT DEFAULT '', subject TEXT DEFAULT '', level TEXT DEFAULT '', goals TEXT DEFAULT '', status TEXT DEFAULT 'active', avatar TEXT DEFAULT 'default.png', tariff TEXT DEFAULT 'premium', theme TEXT DEFAULT 'light', currency TEXT DEFAULT 'BYN', team_id INTEGER DEFAULT 0);
   CREATE TABLE IF NOT EXISTS lessons (id INTEGER PRIMARY KEY AUTOINCREMENT, teacher_id INTEGER, student_id INTEGER, date_time TEXT, status TEXT DEFAULT 'planned', price REAL, topic TEXT DEFAULT '', duration INTEGER DEFAULT 60, link TEXT DEFAULT '', materials TEXT DEFAULT '', grade INTEGER DEFAULT 0, teacher_comment TEXT DEFAULT '', homework TEXT DEFAULT '', lesson_notes TEXT DEFAULT '', student_mood INTEGER DEFAULT 3, plan_next TEXT DEFAULT '', draft TEXT DEFAULT '', is_group INTEGER DEFAULT 0);
