@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MathLore</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 100px 20px; }
+        a { display: inline-block; margin: 10px; padding: 12px 30px; background: #4CAF50; color: white; text-decoration: none; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>📚 MathLore</h1>
+    <p>Журнал репетитора</p>
+    <a href="/login">Войти</a>
+    <a href="/register">Регистрация</a>
+</body>
+</html>
