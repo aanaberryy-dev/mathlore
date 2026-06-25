@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Создать ученика | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.content{max-width:600px;}.success{background:#E8F5E9;color:var(--green);padding:15px;border-radius:8px;margin-top:15px;text-align:center}.error{background:#FFE8E0;color:var(--red);padding:12px;border-radius:8px;margin-bottom:15px}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/students" class="back">← Назад</a><div class="card"><h2>➕ Добавить ученика</h2><% if(error){%><div class="error"><%= error %></div><%}%><% if(!generatedLogin){%><form action="/students/create" method="POST"><input type="text" name="name" placeholder="Имя ученика" required><input type="email" name="email" placeholder="Email ученика" required><input type="text" name="phone" placeholder="Телефон"><input type="text" name="subject" placeholder="Предмет"><input type="text" name="level" placeholder="Уровень"><input type="text" name="goals" placeholder="Цели"><button type="submit" class="btn btn-gold" style="width:100%;">Создать</button></form><%}else{%><div class="success"><h3>✅ Ученик создан!</h3><p><strong>Логин:</strong> <%= generatedLogin %></p><p><strong>Пароль:</strong> <%= generatedPassword %></p></div><a href="/students/create" style="display:block;margin-top:15px;color:var(--gold);text-align:center;">Создать ещё</a><%}%></div></div>
+</body>
+</html>

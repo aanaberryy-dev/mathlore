@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Журнал занятия | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.mood{display:flex;gap:10px;margin-top:5px}.mood label{font-size:30px;cursor:pointer;opacity:.5}.mood input:checked+label{opacity:1}.mood input{display:none}.draft-msg{background:#FFF8E1;padding:10px;border-radius:8px;margin-bottom:15px;font-size:13px}.btn-outline{background:transparent;border:2px solid var(--gold);color:var(--gold)}@media(max-width:600px){.row{grid-template-columns:1fr}}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/dashboard" class="back">← На главную</a><div class="card"><h2>📝 Журнал занятия</h2><p style="color:var(--text2);">Ученик: <strong><%= lesson.student_name %></strong> | <%= new Date(lesson.date_time).toLocaleString('ru-RU') %></p>
+    <% if(lesson.draft){%><div class="draft-msg">⚠️ Есть несохранённые данные. <a href="#" onclick="restoreDraft()">Восстановить?</a></div><%}%>
+    <form action="/journal/<%= lesson.id %>" method="POST" enctype="multipart/form-data" id="journalForm">
+      <label>Тема урока</label><input type="text" name="topic" id="topic" value="<%= lesson.topic||'' %>">
+      <div class="row"><div><label>ДЗ</label><textarea name="homework" id="homework"><%= lesson.homework||'' %></textarea></div><div><label>Конспект</label><textarea name="lesson_notes" id="lesson_notes"><%= lesson.lesson_notes||'' %></textarea></div></div>
+      <div class="row"><div><label>План на следующее</label><textarea name="plan_next" id="plan_next"><%= lesson.plan_next||'' %></textarea></div><div><label>Оценка</label><input type="number" name="grade" id="grade" value="<%= lesson.grade||0 %>" min="0" max="10"><label>Комментарий</label><textarea name="teacher_comment" id="teacher_comment"><%= lesson.teacher_comment||'' %></textarea></div></div>
+      <label>Настроение</label><div class="mood"><% for(var i=1;i<=5;i++){%><input type="radio" name="student_mood" value="<%= i %>" id="mood<%= i %>" <%= lesson.student_mood==i?'checked':'' %>><label for="mood<%= i %>"><%= i==1?'😞':i==2?'😕':i==3?'😐':i==4?'😊':'🤩' %></label><%}%></div>
+      <label>📎 Файлы</label><input type="file" name="files" multiple>
+      <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" name="save_template" value="1" style="width:auto;"> Сохранить как шаблон</label>
+      <button type="submit" class="btn btn-gold" style="width:100%;margin-top:10px;">💾 Сохранить</button>
+      <button type="button" class="btn btn-outline" onclick="saveDraft()" style="width:100%;margin-top:8px;">📝 Черновик</button>
+    </form></div></div>
+  <script>
+    var draft='<%= lesson.draft||"" %>'.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    function restoreDraft(){if(draft){var d=JSON.parse(draft);['topic','homework','lesson_notes','plan_next','grade','teacher_comment'].forEach(id=>{var el=document.getElementById(id);if(el&&d[id]!==undefined)el.value=d[id]});}}
+    function saveDraft(){var d={topic:document.getElementById('topic').value,homework:document.getElementById('homework').value,lesson_notes:document.getElementById('lesson_notes').value,plan_next:document.getElementById('plan_next').value,grade:document.getElementById('grade').value,teacher_comment:document.getElementById('teacher_comment').value};fetch('/journal/draft/<%= lesson.id %>',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({draft:JSON.stringify(d)})}).then(()=>alert('Черновик сохранён!'));}
+    function applyTemplate(json){if(!json)return;var d=JSON.parse(json);['topic','homework','lesson_notes','plan_next'].forEach(id=>{var el=document.getElementById(id);if(el&&d[id]!==undefined)el.value=d[id]});}
+  </script>
+</body>
+</html>

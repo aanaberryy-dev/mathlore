@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Библиотека | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.folder-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}.folder-tab{padding:8px 16px;border-radius:20px;text-decoration:none;font-size:13px;border:2px solid var(--border);color:var(--text)}.folder-tab.active{background:var(--gold);color:white;border-color:var(--gold)}.item{background:var(--white);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}.item h4{margin:0 0 5px}.item p{color:var(--text2);font-size:13px}.del{color:var(--red);text-decoration:none;font-weight:bold;margin-left:10px}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library" class="active">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content"><h2>📚 Библиотека</h2>
+    <div class="folder-tabs"><a href="/library" class="folder-tab <%= currentFolder==='all'?'active':'' %>">Все</a><% folders.forEach(function(f){%><a href="/library?folder=<%= f.folder %>" class="folder-tab <%= currentFolder===f.folder?'active':'' %>"><%= f.folder %></a><%})%></div>
+    <div class="card"><h3>➕ Добавить</h3><form action="/library/add" method="POST" enctype="multipart/form-data"><input type="text" name="title" placeholder="Название" required><input type="text" name="folder" placeholder="Папка" value="Общая"><input type="text" name="description" placeholder="Описание"><label>📎 Файл</label><input type="file" name="file"><button class="btn btn-gold" style="margin-top:8px;">Добавить</button></form></div>
+    <h3>📋 Материалы</h3><% items.forEach(function(item){%><div class="item"><div><h4><%= item.title %></h4><p><%= item.description||'' %></p><p style="font-size:12px;">📁 <%= item.folder %></p></div><div style="display:flex;align-items:center;gap:10px;"><% if(item.file_url){%><a href="<%= item.file_url %>" target="_blank">📎</a><%}%><a href="/library/delete/<%= item.id %>" class="del" onclick="return confirm('Удалить?')">✕</a></div></div><%})%><% if(items.length===0){%><p style="color:var(--text2);">Нет материалов</p><%}%></div>
+</body>
+</html>

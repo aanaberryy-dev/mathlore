@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Сравнение | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/students">👨‍🎓 Ученики</a><a href="/compare" class="active">📊 Сравнение</a><a href="/finances">💰 Финансы</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content"><h2>📊 Сравнение учеников</h2><div class="card"><form action="/compare" method="GET"><h3>Выберите учеников</h3><select name="ids" multiple style="width:100%;height:150px;"><% students.forEach(function(s){%><option value="<%= s.id %>" <%= selected.includes(String(s.id))?'selected':'' %>><%= s.name %></option><%})%></select><button class="btn btn-gold" style="margin-top:10px;">Сравнить</button></form></div><% if(data){%><div class="card"><h3>Результаты</h3><table><tr><th>Ученик</th><th>Занятий</th><th>Средний балл</th><th>Доход</th></tr><% data.forEach(function(d){%><tr><td><%= d.name %></td><td><%= d.cnt %></td><td><%= Number(d.avg).toFixed(1) %></td><td><%= d.total %> <%= user.currency||'BYN' %></td></tr><%})%></table></div><%}%></div>
+</body>
+</html>

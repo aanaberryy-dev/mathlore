@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Аналитика | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.bar-chart{display:flex;align-items:flex-end;gap:10px;height:200px}.bar-col{flex:1;text-align:center}.bar{width:100%;border-radius:6px 6px 0 0;min-height:4px;background:var(--gold)}.bar-label{font-size:10px;color:var(--text2);margin-top:5px}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics" class="active">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content"><h2>📊 Аналитика</h2>
+    <div class="card"><h3>📈 Доход по месяцам</h3><div class="bar-chart"><% incomeData.forEach(function(d){%><div class="bar-col"><div style="font-size:11px;"><%= d.total||0 %></div><div class="bar" style="height:<%=(d.total||0)/100%>px;"></div><div class="bar-label"><%= d.month %></div></div><%})%></div></div>
+    <div class="card"><h3>🏆 Топ учеников</h3><table><tr><th>Ученик</th><th>Занятий</th><th>Средний балл</th><th>Доход</th></tr><% topStudents.forEach(function(s){%><tr><td><%= s.name %></td><td><%= s.cnt %></td><td><%= Number(s.avg).toFixed(1) %></td><td><%= s.total %> <%= user.currency||'BYN' %></td></tr><%})%></table></div>
+    <div class="card"><h3>📋 Общая статистика</h3><table><tr><td>Активных учеников</td><td><strong><%= activeStudents %></strong></td></tr><tr><td>Занятий в этом месяце</td><td><strong><%= thisMonthLessons %></strong></td></tr></table></div>
+  </div>
+</body>
+</html>

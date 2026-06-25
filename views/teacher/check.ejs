@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>ДЗ на проверку | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><h2>📝 Домашки на проверку</h2><% if(homeworks.length===0){%><div class="empty">Всё проверено!</div><%}%><% homeworks.forEach(function(h){%><div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><h3><%= h.title %></h3><p style="color:var(--text2);">Ученик: <%= h.student_name %> | Срок: <%= h.deadline||'—' %></p></div><div style="display:flex;gap:10px;"><a href="/review/<%= h.id %>" class="btn btn-gold">📋 Проверить</a><a href="/homework/delete/<%= h.id %>" class="btn btn-red" onclick="return confirm('Удалить?')">✕</a></div></div><%})%></div>
+</body>
+</html>

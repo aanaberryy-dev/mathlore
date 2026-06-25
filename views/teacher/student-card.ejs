@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Карточка ученика | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .top-actions { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: var(--white); padding: 5px; border-radius: 10px; }
+    .tab { padding: 10px 20px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text2); }
+    .tab.active { background: var(--gold); color: white; }
+    .tab-content { display: none; } .tab-content.active { display: block; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .chart-bar { display: flex; align-items: flex-end; gap: 8px; height: 150px; }
+    .chart-col { flex: 1; text-align: center; }
+    .chart-fill { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; background: var(--gold); }
+    .chart-label { font-size: 10px; color: var(--text2); margin-top: 4px; }
+    .tag { display: inline-block; background: #FAF0E6; color: var(--gold); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 2px; }
+    .goal-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 14px; }
+    .goal-done { text-decoration: line-through; color: var(--text2); }
+    @media (max-width: 600px) { .row { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students" class="active">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content">
+    <a href="/students" class="back">← Назад</a>
+    <h2><%= student.name %></h2><p style="color:var(--text2);"><%= student.email %> | <%= student.phone||'Нет телефона' %></p>
+    <div class="top-actions"><a href="/calendar/add?student_id=<%= student.id %>" class="btn btn-gold">➕ Занятие</a><a href="/students/<%= student.id %>/report" class="btn btn-blue">📄 Отчёт</a><a href="/students/<%= student.id %>/progress" class="btn btn-green">📈 Прогресс</a><a href="/students/<%= student.id %>/delete" class="btn btn-red" onclick="return confirm('Удалить?')">🗑</a></div>
+    <div class="card" style="padding:10px 20px;"><strong>Теги:</strong><% studentTags.forEach(function(t){%><span class="tag"><%= t.name %> <a href="/students/<%= student.id %>/tags/delete/<%= t.tag_id %>" style="color:var(--red);">✕</a></span><%})%><form action="/students/<%= student.id %>/tags" method="POST" style="display:inline;"><select name="tag_id" onchange="this.form.submit()" style="width:auto;padding:4px;"><option value="">+</option><% allTags.forEach(function(t){%><option value="<%= t.id %>"><%= t.name %></option><%})%></select></form><form action="/tags/add" method="POST" style="display:inline;"><input type="text" name="name" placeholder="Новый тег" style="width:80px;padding:4px;"></form></div>
+    <div class="tabs"><button class="tab active" onclick="switchTab('info')">📋 Данные</button><button class="tab" onclick="switchTab('lessons')">📖 Занятия</button><button class="tab" onclick="switchTab('progress')">📈 Прогресс</button><button class="tab" onclick="switchTab('payments')">💰 Финансы</button><button class="tab" onclick="switchTab('goals')">🎯 Цели</button></div>
+    <div id="tab-info" class="tab-content active"><div class="card"><h3>✏️ Редактировать</h3><form action="/students/<%= student.id %>" method="POST"><div class="row"><div><label>Имя</label><input type="text" name="name" value="<%= student.name %>" required></div><div><label>Email</label><input type="email" name="email" value="<%= student.email %>" required></div></div><div class="row"><div><label>Телефон</label><input type="text" name="phone" value="<%= student.phone||'' %>"></div><div><label>Предмет</label><input type="text" name="subject" value="<%= student.subject||'' %>"></div></div><div class="row"><div><label>Уровень</label><input type="text" name="level" value="<%= student.level||'' %>"></div><div><label>Цели</label><input type="text" name="goals" value="<%= student.goals||'' %>"></div></div><label>Заметки</label><textarea name="notes" rows="2"><%= student.notes||'' %></textarea><select name="status" style="width:auto;margin-top:8px;"><option value="active" <%= student.status==='active'?'selected':'' %>>🟢 Активен</option><option value="frozen" <%= student.status==='frozen'?'selected':'' %>>⏸ Неактивен</option></select><button class="btn btn-gold" style="margin-top:10px;">💾 Сохранить</button></form></div></div>
+    <div id="tab-lessons" class="tab-content"><div class="card"><h3>📖 История занятий</h3><table><tr><th>Дата</th><th>Тема</th><th>Оценка</th><th>Настроение</th><th></th></tr><% lessons.forEach(function(l){%><tr><td><%=(l.date_time||'').slice(0,10)%></td><td><%= l.topic||'—' %></td><td><%= l.grade||'—' %></td><td><%= l.student_mood==1?'😞':l.student_mood==2?'😕':l.student_mood==3?'😐':l.student_mood==4?'😊':l.student_mood==5?'🤩':'—' %></td><td><a href="/journal/<%= l.id %>">📝</a></td></tr><%})%></table></div></div>
+    <div id="tab-progress" class="tab-content"><div class="card"><h3>📈 График оценок</h3><div class="chart-bar"><% lessons.filter(l=>l.status==='done').forEach(function(l){%><div class="chart-col"><div style="font-size:11px;"><%= l.grade||0 %></div><div class="chart-fill" style="height:<%=(l.grade||0)*15%>px;"></div><div class="chart-label"><%=(l.date_time||'').slice(0,10)%></div></div><%})%></div></div></div>
+    <div id="tab-payments" class="tab-content"><div class="card"><h3>💰 Оплаты</h3><table><tr><th>Дата</th><th>Сумма</th></tr><% payments.forEach(function(p){%><tr><td><%= p.date %></td><td><%= p.amount %> <%= user.currency||'BYN' %></td></tr><%})%></table></div><% if(subs&&subs.length>0){%><div class="card"><h3>🎫 Абонементы</h3><table><tr><th>Начало</th><th>Всего</th><th>Осталось</th></tr><% subs.forEach(function(s){%><tr><td><%= s.start_date %></td><td><%= s.lessons_total %></td><td><%= s.lessons_left %></td></tr><%})%></table></div><%}%></div>
+    <div id="tab-goals" class="tab-content"><div class="card"><h3>🎯 Цели</h3><form action="/students/<%= student.id %>/goals" method="POST"><input type="text" name="title" placeholder="Новая цель" style="width:70%;display:inline;"><button class="btn btn-green" style="width:auto;">Добавить</button></form><% goals.forEach(function(g){%><div class="goal-item"><a href="/goals/toggle/<%= g.id %>" style="color:var(--green);"><%= g.done?'☑':'☐' %></a><span class="<%= g.done?'goal-done':'' %>"><%= g.title %></span></div><%})%></div></div>
+  </div>
+  <script>function switchTab(name){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));event.target.classList.add('active');document.getElementById('tab-'+name).classList.add('active');}</script>
+</body>
+</html>

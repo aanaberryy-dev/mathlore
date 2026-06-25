@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Вход | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, var(--bg) 0%, var(--white) 100%); }
+    .login-box { background: var(--white); padding: 40px; border-radius: 16px; box-shadow: var(--shadow); width: 400px; max-width: 90%; }
+    .login-box .logo { text-align: center; font-size: 28px; margin-bottom: 30px; color: var(--text); }
+    h1 { font-size: 20px; color: var(--text); text-align: center; margin-bottom: 20px; }
+    input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid var(--border); border-radius: 10px; font-size: 16px; background: var(--white); color: var(--text); }
+    input:focus { outline: none; border-color: var(--gold); }
+    button { width: 100%; padding: 14px; background: var(--gold); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .error { background: #FFE8E0; color: #C28B7A; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+    .link { text-align: center; margin-top: 15px; color: var(--text2); font-size: 14px; }
+    .link a { color: var(--gold); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div>
+    <h1>Вход в кабинет</h1>
+    <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <form action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Пароль" required>
+      <button type="submit">Войти</button>
+    </form>
+    <div class="link">Нет аккаунта? <a href="/register">Создать</a></div>
+  </div>
+</body>
+</html>

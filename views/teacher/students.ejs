@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Ученики | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .top-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .add-btn { background: var(--gold); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .filter-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+    .filter-tab { padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; border: 2px solid var(--border); color: var(--text); background: var(--white); cursor: pointer; }
+    .filter-tab.active { background: var(--gold); color: white; border-color: var(--gold); }
+    .search { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; flex: 1; min-width: 200px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+    .card { position: relative; padding: 25px; }
+    .card h3 { margin-bottom: 5px; font-size: 18px; }
+    .card p { color: var(--text2); font-size: 13px; margin: 3px 0; }
+    .card .btns { margin-top: 10px; display: flex; gap: 8px; }
+    .btn-red { color: var(--red); font-size: 16px; position: absolute; top: 10px; right: 15px; text-decoration: none; }
+    .import-btn { background: var(--green); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; }
+    .tag-filter { padding: 4px 10px; border-radius: 12px; font-size: 12px; text-decoration: none; background: #FAF0E6; color: var(--gold); }
+    @media (max-width: 600px) { .top-row { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students" class="active">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content">
+    <div class="top-row"><a href="/students/create" class="add-btn">➕ Добавить</a><form action="/students/import" method="POST" enctype="multipart/form-data" style="display:inline;"><input type="file" name="csvfile" accept=".csv" onchange="this.form.submit()" style="display:none;" id="csvInput"><button type="button" class="import-btn" onclick="document.getElementById('csvInput').click()">📥 CSV</button></form><input type="text" class="search" placeholder="🔍 Поиск..." oninput="filterStudents()"><div class="filter-tabs"><button class="filter-tab active" onclick="setFilter('all')">Все</button><button class="filter-tab" onclick="setFilter('active')">🟢 Активные</button><button class="filter-tab" onclick="setFilter('frozen')">⏸ Неактивные</button></div><% tags.forEach(function(t){%><a href="/students?tag=<%= t.name %>" class="tag-filter"><%= t.name %></a><%})%></div>
+    <h2>👨‍🎓 Мои ученики (<%= students.length %>)</h2>
+    <% if(students.length===0){%><div class="empty">Нет учеников</div><%}%>
+    <div class="grid" id="studentsGrid"><% students.forEach(function(s){%><div class="card" data-status="<%= s.status %>" data-name="<%= s.name.toLowerCase() %>"><a href="/students/<%= s.id %>/delete" class="btn-red" onclick="return confirm('Удалить?')">✕</a><h3><%= s.name %></h3><p><%= s.email %></p><p><%= s.subject||'—' %> | <%= s.level||'' %></p><p><%= s.status==='active'?'🟢 Активен':'⏸ Неактивен' %></p><div class="btns"><a href="/students/<%= s.id %>" class="btn btn-gold">📋</a><a href="/students/<%= s.id %>/progress" class="btn btn-green">📈</a></div></div><%})%></div>
+  </div>
+  <script>let cf='all';function setFilter(f){cf=f;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');filterStudents()}function filterStudents(){let q=document.querySelector('.search').value.toLowerCase();document.querySelectorAll('#studentsGrid .card').forEach(c=>{c.style.display=(c.dataset.name.includes(q)&&(cf==='all'||c.dataset.status===cf))?'':'none'})}</script>
+</body>
+</html>

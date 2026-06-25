@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Группа <%= group.name %> | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; }
+    .stat-card .num { font-size: 28px; font-weight: 700; }
+    .green { color: var(--green); } .blue { color: var(--blue); } .gold { color: var(--gold); }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠</a><a href="/calendar">📅</a><a href="/students">👨‍🎓</a><a href="/groups" class="active">👥</a><a href="/finances">💰</a><a href="/library">📚</a><a href="/analytics">📊</a><a href="/settings">⚙️</a></div>
+  <div class="content">
+    <a href="/groups" class="back">← К списку групп</a>
+    <h2>👥 <%= group.name %></h2>
+    <p style="color:var(--text2);"><%= group.subject||'—' %> | <%= group.level||'—' %> | <%= group.status==='active'?'🟢 Активна':'📁 Завершена' %></p>
+    <% if(group.description){%><p style="color:var(--text2);font-size:13px;"><%= group.description %></p><%}%>
+
+    <div class="cards">
+      <div class="stat-card"><div class="num blue"><%= students.length %></div><div>Учеников</div></div>
+      <div class="stat-card"><div class="num gold"><%= Number(avgGrade).toFixed(1) %></div><div>Средний балл</div></div>
+      <div class="stat-card"><div class="num green"><%= attendance %>%</div><div>Посещаемость</div></div>
+      <div class="stat-card"><div class="num blue"><%= totalLessons %></div><div>Занятий всего</div></div>
+    </div>
+
+    <div class="card"><h3>➕ Создать занятие для группы</h3><form action="/groups/<%= group.id %>/add-lesson" method="POST"><div style="display:flex;gap:10px;flex-wrap:wrap;"><input type="datetime-local" name="date_time" required><input type="text" name="topic" placeholder="Тема"><input type="number" name="price" value="<%= group.price||40 %>" placeholder="Цена" style="width:100px;"><input type="number" name="duration" value="60" placeholder="Мин" style="width:80px;"><input type="url" name="link" placeholder="Zoom" style="width:150px;"><button class="btn btn-green">Создать</button></div></form></div>
+
+    <div class="card"><h3>👨‍🎓 Ученики (<%= students.length %>)</h3><table><tr><th>Имя</th><th>Email</th><th>Предмет</th><th></th></tr><% students.forEach(function(s){%><tr><td><%= s.name %></td><td><%= s.email %></td><td><%= s.subject||'—' %></td><td><a href="/students/<%= s.id %>" class="btn btn-gold btn-sm">📋</a></td></tr><%})%></table>
+      <form action="/groups/<%= group.id %>/add-student" method="POST" style="margin-top:10px;display:flex;gap:10px;">
+        <select name="student_id"><% allStudents.forEach(function(s){%><option value="<%= s.id %>"><%= s.name %></option><%})%></select>
+        <button class="btn btn-green btn-sm">➕ Добавить ученика</button>
+      </form>
+    </div>
+
+    <div class="card"><h3>📅 Расписание группы</h3><table><tr><th>Дата</th><th>Тема</th><th>Статус</th></tr><% lessons.forEach(function(l){%><tr><td><%=(l.date_time||'').slice(0,16)%></td><td><%= l.topic||'—' %></td><td><%= l.status %></td></tr><%})%></table></div>
+
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <% if(group.status==='active'){%><a href="/groups/<%= group.id %>/complete" class="btn btn-blue" onclick="return confirm('Завершить группу?')">📁 Завершить</a><%}%>
+      <a href="/groups/delete/<%= group.id %>" class="btn btn-red" onclick="return confirm('Удалить?')">🗑 Удалить</a>
+    </div>
+  </div>
+</body>
+</html>

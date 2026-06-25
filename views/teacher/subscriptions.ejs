@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"><title>Абонементы | Журнал репетитора</title>
+  <style>:root{--bg:#F4F6F9;--white:#FFFFFF;--text:#1E2329;--text2:#6B7A8F;--border:#E6EAEF;--gold:#D4A373;--green:#80A695;--shadow:0 2px 8px rgba(0,0,0,0.06)}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}.header{background:var(--white);padding:12px 30px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}.logo{font-size:20px;font-weight:700}.logo span{color:var(--gold)}.header-right{display:flex;align-items:center;gap:15px}.badge{background:var(--gold);color:white;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}.avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:white;display:flex;align-items:center;justify-content:center;font-weight:700}.logout{color:var(--text2);text-decoration:none;font-size:14px}.menu{background:var(--white);padding:0 30px;display:flex;border-bottom:1px solid var(--border)}.menu a{text-decoration:none;color:var(--text2);padding:12px 18px;font-size:14px;font-weight:500;border-bottom:2px solid transparent}.menu a:hover{color:var(--text)}.content{padding:25px 30px;max-width:800px;margin:0 auto}.card{background:var(--white);padding:20px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:15px}input,select,button{padding:10px;border:1px solid var(--border);border-radius:6px;font-size:14px}.btn{background:var(--gold);color:white;border:none;cursor:pointer;font-weight:600}.sub-item{padding:12px;border-radius:8px;margin:5px 0;display:flex;justify-content:space-between;align-items:center;background:var(--white)}.active-sub{border-left:3px solid var(--green)}@media(max-width:600px){.menu{overflow-x:auto}.content{padding:15px}}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span style="font-weight:600;font-size:14px;"><%= user.name %></span><a href="/logout" class="logout">🚪 Выйти</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/check">📝 ДЗ</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content">
+    <h2>🎫 Абонементы</h2>
+    <div class="card"><h3>➕ Добавить</h3><form action="/subscriptions/add" method="POST" style="display:flex;gap:10px;flex-wrap:wrap;"><select name="student_id"><% students.forEach(function(s){ %><option value="<%= s.id %>"><%= s.name %></option><% }) %></select><input type="number" name="lessons_total" placeholder="Занятий" required><input type="date" name="start_date" required><button class="btn">Добавить</button></form></div>
+    <h3>✅ Активные</h3>
+    <% active.forEach(function(s){ %><div class="sub-item active-sub"><span><strong><%= s.student_name %></strong> — <%= s.lessons_left %> из <%= s.lessons_total %></span><a href="/subscriptions/use/<%= s.id %>" class="btn" style="font-size:12px;">-1</a></div><% }) %>
+    <% if (active.length===0) { %><p style="color:var(--text2);">Нет активных</p><% } %>
+  </div>
+</body>
+</html>

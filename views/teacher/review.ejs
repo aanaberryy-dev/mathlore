@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Проверка ДЗ | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/check" class="back">← Назад</a><div class="card"><h2><%= homework.title %></h2><p style="color:var(--text2);">Ученик: <strong><%= homework.student_name %></strong> | Срок: <%= homework.deadline||'—' %></p><% if(homework.file){%><p>📎 <a href="<%= homework.file %>" target="_blank">Скачать файл</a></p><%}%><form action="/review/<%= homework.id %>" method="POST"><input type="text" name="grade" placeholder="Оценка" value="<%= homework.grade||'' %>"><textarea name="feedback" placeholder="Комментарий"><%= homework.feedback||'' %></textarea><button type="submit" class="btn btn-gold" style="width:100%;">✅ Отправить</button></form></div></div>
+</body>
+</html>

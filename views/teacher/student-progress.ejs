@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Прогресс | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.chart-wrap{background:var(--white);padding:20px;border-radius:12px;box-shadow:var(--shadow)}.bar-chart{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:20px}.bar-col{flex:1;text-align:center}.bar{width:40px;border-radius:6px 6px 0 0;min-height:4px;background:var(--gold)}.bar-label{font-size:11px;color:var(--text2);margin-top:5px}.bar-value{font-size:12px;font-weight:600;margin-bottom:4px}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/students" class="back">← К списку</a><div class="card"><h2>📈 Прогресс: <%= student.name %></h2><p style="color:var(--text2);"><%= student.subject||'—' %> | <%= student.level||'' %></p></div><div class="chart-wrap"><h3>📊 Оценки по занятиям</h3><div class="bar-chart"><% lessons.forEach(function(l){%><div class="bar-col"><div class="bar-value"><%= l.grade||0 %></div><div class="bar" style="height:<%=(l.grade||0)*20%>px;"></div><div class="bar-label"><%=(l.date_time||'').slice(0,10)%></div></div><%})%></div></div></div>
+</body>
+</html>

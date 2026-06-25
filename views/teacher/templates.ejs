@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Шаблоны | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.del{color:var(--red);text-decoration:none}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/templates" class="active">📋 Шаблоны</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content"><h2>📋 Шаблоны уроков</h2><% templates.forEach(function(t){%><div class="card"><h3><%= t.name %></h3><p style="color:var(--text2);font-size:13px;"><% var c=JSON.parse(t.content);%><%= (c.topic||'')+' | '+(c.homework||'').slice(0,50) %></p><a href="/templates/delete/<%= t.id %>" class="del">✕ Удалить</a></div><%})%><% if(templates.length===0){%><p style="color:var(--text2);">Нет шаблонов</p><%}%></div>
+</body>
+</html>

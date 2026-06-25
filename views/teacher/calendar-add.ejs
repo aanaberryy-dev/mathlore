@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Создать занятие | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.content{max-width:500px;}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/dashboard" class="back">← На главную</a>
+    <div class="card"><h2>➕ Создать занятие</h2>
+      <form action="/calendar/add" method="POST">
+        <select name="student_id"><% students.forEach(function(s){ %><option value="<%= s.id %>" <%= preselected==s.id?'selected':'' %>><%= s.name %></option><% }) %></select>
+        <input type="datetime-local" name="date_time" required>
+        <input type="number" name="duration" value="60" placeholder="Длительность (мин)">
+        <input type="text" name="topic" placeholder="Тема">
+        <input type="number" name="price" value="40" placeholder="Цена">
+        <select name="repeat"><option value="0">Без повтора</option><option value="7">Каждую неделю</option><option value="14">Раз в 2 недели</option></select>
+        <input type="number" name="repeat_count" value="0" placeholder="Повторов (0=без)">
+        <input type="url" name="link" placeholder="Ссылка Zoom">
+        <button type="submit" class="btn btn-green" style="width:100%;margin-top:10px;">Создать</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Настройки | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>.success{background:#E8F5E9;color:var(--green);padding:12px;border-radius:8px;margin-bottom:15px;text-align:center}.content{max-width:500px}</style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="content"><a href="/dashboard" class="back">← На главную</a><div class="card"><h2>⚙️ Настройки</h2><% if(success){%><div class="success"><%= success %></div><%}%><form action="/settings" method="POST"><label>Имя</label><input type="text" name="name" value="<%= user.name %>" required><label>Email</label><input type="email" name="email" value="<%= user.email %>" required><label>Валюта</label><select name="currency"><option value="BYN" <%= user.currency==='BYN'?'selected':'' %>>BYN</option><option value="RUB" <%= user.currency==='RUB'?'selected':'' %>>RUB</option><option value="USD" <%= user.currency==='USD'?'selected':'' %>>USD</option><option value="EUR" <%= user.currency==='EUR'?'selected':'' %>>EUR</option></select><label>Новый пароль</label><input type="password" name="password" placeholder="Оставьте пустым"><button type="submit" class="btn btn-gold" style="width:100%;">💾 Сохранить</button></form></div></div>
+</body>
+</html>

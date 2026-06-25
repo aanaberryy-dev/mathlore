@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Счета | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content"><h2>🧾 Счета</h2><div class="card"><h3>Создать счёт</h3><form action="/receipts/add" method="POST" style="display:flex;gap:10px;flex-wrap:wrap;"><select name="student_id"><% students.forEach(function(s){%><option value="<%= s.id %>"><%= s.name %></option><%})%></select><input type="month" name="month" required><button class="btn btn-gold">Создать</button></form></div><h3>Список счетов</h3><table><tr><th>Дата</th><th>Ученик</th><th>Месяц</th><th>Сумма</th></tr><% receipts.forEach(function(r){%><tr><td><%= r.created_at %></td><td><%= r.student_name %></td><td><%= r.month %></td><td><%= r.total %> <%= user.currency||'BYN' %></td></tr><%})%></table></div>
+</body>
+</html>

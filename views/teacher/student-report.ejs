@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Отчёт для родителей | Журнал репетитора</title>
+  <style>
+    :root { --bg: #F4F6F9; --white: #FFFFFF; --text: #1E2329; --text2: #6B7A8F; --border: #E6EAEF; --gold: #D4A373; --green: #80A695; --red: #C28B7A; --shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .header { background: var(--white); padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 20px; font-weight: 700; } .logo span { color: var(--gold); }
+    .header-right { display: flex; align-items: center; gap: 15px; }
+    .badge { background: var(--gold); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .logout { color: var(--text2); text-decoration: none; font-size: 14px; }
+    .content { padding: 25px 30px; max-width: 900px; margin: 0 auto; }
+    .back { color: var(--gold); text-decoration: none; font-size: 14px; display: inline-block; margin-bottom: 15px; }
+    .report { background: var(--white); padding: 30px; border-radius: 12px; box-shadow: var(--shadow); }
+    .report h2 { margin-bottom: 5px; font-size: 22px; }
+    .report .meta { color: var(--text2); margin-bottom: 25px; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+    th { background: #fafafa; color: var(--text2); }
+    .print-btn { background: var(--gold); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    @media print { .header, .back, .print-btn { display: none; } body { background: white; } .report { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div>
+    <div class="header-right">
+      <span class="badge">👑 Премиум</span>
+      <div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+      <span style="font-weight:600;font-size:14px;"><%= user.name %></span>
+      <a href="/logout" class="logout">🚪 Выйти</a>
+    </div>
+  </div>
+  <div class="content">
+    <a href="/students/<%= student.id %>" class="back">← Назад к карточке</a>
+    <button class="print-btn" onclick="window.print()" style="margin-bottom:15px;">🖨️ Распечатать</button>
+    <div class="report">
+      <h2>📄 Отчёт об успеваемости</h2>
+      <p class="meta">
+        Ученик: <strong><%= student.name %></strong><br>
+        Предмет: <%= student.subject||'—' %> | Уровень: <%= student.level||'—' %><br>
+        Дата отчёта: <%= new Date().toLocaleDateString('ru-RU') %>
+      </p>
+
+      <h3>📊 Сводка</h3>
+      <table>
+        <tr><td>Всего занятий</td><td><strong><%= lessons.length %></strong></td></tr>
+        <tr><td>Проведено</td><td><strong><%= lessons.filter(l=>l.status==='done').length %></strong></td></tr>
+        <tr><td>Средняя оценка</td><td><strong>
+          <% var grades = lessons.filter(l=>l.grade>0).map(l=>l.grade); %>
+          <%= grades.length>0 ? (grades.reduce((a,b)=>a+b,0)/grades.length).toFixed(1) : '—' %>
+        </strong></td></tr>
+        <tr><td>Настроение (среднее)</td><td><strong>
+          <% var moods = lessons.filter(l=>l.student_mood>0).map(l=>l.student_mood); %>
+          <%= moods.length>0 ? (moods.reduce((a,b)=>a+b,0)/moods.length).toFixed(1) : '—' %> / 5
+        </strong></td></tr>
+        <tr><td>Выдано ДЗ</td><td><strong><%= homeworks.length %></strong></td></tr>
+        <tr><td>Всего оплат</td><td><strong><%= payments.reduce((s,p)=>s+Number(p.amount),0).toFixed(0) %> BYN</strong></td></tr>
+      </table>
+
+      <h3>📖 История занятий</h3>
+      <table>
+        <tr><th>Дата</th><th>Тема</th><th>Оценка</th><th>Настроение</th><th>Комментарий</th></tr>
+        <% lessons.forEach(function(l){ %>
+          <tr>
+            <td><%=(l.date_time||'').slice(0,10)%></td>
+            <td><%= l.topic||'—' %></td>
+            <td><%= l.grade||'—' %></td>
+            <td><%= l.student_mood==1?'😞':l.student_mood==2?'😕':l.student_mood==3?'😐':l.student_mood==4?'😊':l.student_mood==5?'🤩':'—' %></td>
+            <td><%= l.teacher_comment||'—' %></td>
+          </tr>
+        <% }) %>
+      </table>
+
+      <% if (lessons.length===0) { %><p style="color:var(--text2);">Нет данных для отчёта</p><% } %>
+    </div>
+  </div>
+</body>
+</html>

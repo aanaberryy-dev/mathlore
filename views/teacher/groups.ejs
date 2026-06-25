@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Группы | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+    .group-card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
+    .group-card h3 { margin-bottom: 8px; }
+    .group-card p { color: var(--text2); font-size: 13px; margin: 3px 0; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠</a><a href="/calendar">📅</a><a href="/students">👨‍🎓</a><a href="/groups" class="active">👥</a><a href="/finances">💰</a><a href="/library">📚</a><a href="/analytics">📊</a><a href="/settings">⚙️</a></div>
+  <div class="content">
+    <h2>👥 Групповые занятия</h2>
+
+    <div class="card"><h3>➕ Создать группу</h3>
+      <form action="/groups/add" method="POST" id="groupForm">
+        <input type="text" name="name" placeholder="Название группы" required>
+        <input type="text" name="subject" placeholder="Предмет">
+        <input type="text" name="level" placeholder="Уровень">
+        <input type="text" name="description" placeholder="Описание">
+        <input type="number" name="price" placeholder="Цена за занятие" value="40">
+        <label>Ученики (можно выбрать несколько)</label>
+        <select id="studentsSelect" multiple style="height:120px;">
+          <% allStudents.forEach(function(s){ %><option value="<%= s.id %>"><%= s.name %></option><% }) %>
+        </select>
+        <input type="hidden" name="students" id="studentsHidden">
+        <button type="submit" class="btn btn-gold" style="margin-top:8px;" onclick="prepareSubmit()">Создать группу</button>
+      </form>
+    </div>
+
+    <h3>📋 Мои группы</h3>
+    <% if(groups.length===0){%><p style="color:var(--text2);">Нет групп</p><%}%>
+    <div class="grid"><% groups.forEach(function(g){%><div class="group-card"><h3><%= g.name %></h3><p><%= g.subject||'—' %> | <%= g.level||'—' %></p><p><%= g.status==='active'?'🟢 Активна':'📁 Завершена' %></p><div style="margin-top:10px;"><a href="/groups/<%= g.id %>" class="btn btn-gold btn-sm">Открыть</a><a href="/groups/delete/<%= g.id %>" class="btn btn-red btn-sm" onclick="return confirm('Удалить?')">✕</a></div></div><%})%></div>
+  </div>
+  <script>
+    function prepareSubmit() {
+      var sel = document.getElementById('studentsSelect');
+      var ids = [];
+      for (var i=0; i<sel.options.length; i++) {
+        if (sel.options[i].selected) ids.push(sel.options[i].value);
+      }
+      document.getElementById('studentsHidden').value = ids.join(',');
+    }
+  </script>
+</body>
+</html>

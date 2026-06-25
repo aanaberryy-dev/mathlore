@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Расписание | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .view-btns { display: flex; gap: 10px; margin-bottom: 20px; }
+    .view-btns button { padding: 10px 20px; border: 2px solid var(--gold); background: var(--white); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--text); }
+    .view-btns button.active { background: var(--gold); color: white; }
+    .layout { display: grid; grid-template-columns: 1fr 400px; gap: 25px; }
+    .box { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); }
+    .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .nav button { background: var(--gold); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+    .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal .day { padding: 12px 6px; text-align: center; border-radius: 8px; cursor: pointer; background: var(--white); font-size: 14px; }
+    .cal .day:hover { background: var(--border); }
+    .cal .day.today { border: 2px solid var(--gold); font-weight: bold; }
+    .cal .day.selected { background: var(--gold); color: white; }
+    .cal .day.has::after { content: "●"; color: var(--red); font-size: 10px; display: block; }
+    .cal .header-cell { text-align: center; font-weight: bold; color: var(--text2); padding: 8px; font-size: 13px; }
+    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+    .day-col { border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 180px; }
+    .day-col h4 { margin: 0 0 8px; color: var(--gold); font-size: 14px; }
+    .lesson-item { padding: 8px; margin: 4px 0; border-radius: 6px; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .lesson-item.planned { background: #EEF2FF; border-left: 3px solid var(--blue); }
+    .lesson-item.paid { background: #E8F5E9; border-left: 3px solid var(--green); }
+    .lesson-item.cancelled { background: #FFEBEE; border-left: 3px solid var(--red); text-decoration: line-through; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--white); padding: 25px; border-radius: 12px; width: 450px; max-width: 90%; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>">🌙</a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard">🏠 Главная</a><a href="/calendar" class="active">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content">
+    <div class="view-btns"><button id="btnMonth" class="active" onclick="setView('month')">📅 Месяц</button><button id="btnWeek" onclick="setView('week')">📆 Неделя</button><button id="btnDay" onclick="setView('day')">📋 День</button></div>
+    <div class="layout"><div class="box"><div class="nav"><button onclick="change(-1)">←</button><span id="periodLabel"></span><button onclick="change(1)">→</button></div><div id="calendarView"></div></div>
+      <div class="box"><h3 id="selectedLabel">Выберите дату</h3><div id="lessonList"><p>Нажмите на день</p></div>
+        <div id="addForm" style="display:none;margin-top:15px;"><h4>➕ Новый урок</h4><select id="studentSelect"><% students.forEach(function(s){%><option value="<%= s.id %>"><%= s.name %></option><%})%></select><input type="datetime-local" id="lessonDT"><input type="number" id="lessonDur" value="60" placeholder="Длительность"><input type="text" id="lessonTopic" placeholder="Тема"><input type="number" id="lessonPrice" value="40" placeholder="Цена"><select id="lessonRepeat"><option value="0">Без повтора</option><option value="7">Каждую неделю</option><option value="14">Раз в 2 недели</option></select><input type="number" id="lessonRepeatCount" value="0" placeholder="Повторов"><button class="btn btn-green" onclick="addLesson()" style="width:100%;margin-top:10px;">Добавить</button></div></div></div>
+  </div>
+  <div class="modal" id="editModal"><div class="modal-content"><h3>✏️ Редактировать</h3><input type="hidden" id="editId"><label>Дата</label><input type="datetime-local" id="editDT"><label>Тема</label><input type="text" id="editTopic"><label>Цена</label><input type="number" id="editPrice"><label>Статус</label><select id="editStatus"><option value="planned">Запланирован</option><option value="paid">Оплачен</option><option value="cancelled">Отменён</option></select><div style="margin-top:15px;display:flex;gap:10px;"><button class="btn btn-blue" onclick="saveEdit()">Сохранить</button><button class="btn btn-red" onclick="deleteLesson()">Удалить</button></div><button onclick="closeModal()" style="width:100%;margin-top:5px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--white);color:var(--text);cursor:pointer;">Закрыть</button></div></div>
+  <script>
+    let view='month',cur=new Date(),sel=null,lessons=<%- JSON.stringify(lessons) %>;
+    function setView(v){view=v;document.querySelectorAll('.view-btns button').forEach(b=>b.classList.remove('active'));document.getElementById('btn'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('active');render()}
+    function change(n){if(view==='month')cur.setMonth(cur.getMonth()+n);else if(view==='week')cur.setDate(cur.getDate()+n*7);else cur.setDate(cur.getDate()+n);render()}
+    function gd(l){return(l.date_time||'').slice(0,10)}function gt(l){return(l.date_time||'').slice(11,16)}function fd(d){return d.toISOString().slice(0,10)}
+    function render(){if(view==='month')renderMonth();else if(view==='week')renderWeek();else renderDay()}
+    function renderMonth(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1),off=first.getDay()-1;if(off<0)off=6;let days=new Date(y,m+1,0).getDate(),today=fd(new Date()),h='<div class="cal"><div class="header-cell">Пн</div><div class="header-cell">Вт</div><div class="header-cell">Ср</div><div class="header-cell">Чт</div><div class="header-cell">Пт</div><div class="header-cell">Сб</div><div class="header-cell">Вс</div>';document.getElementById('periodLabel').textContent=first.toLocaleString('ru',{month:'long',year:'numeric'});for(let i=0;i<off;i++)h+='<div class="day other"></div>';for(let d=1;d<=days;d++){let ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');let cls='day';if(ds===today)cls+=' today';if(ds===sel)cls+=' selected';if(lessons.some(l=>gd(l)===ds))cls+=' has';h+='<div class="'+cls+'" onclick="pickDay(\''+ds+'\')">'+d+'</div>'}h+='</div>';document.getElementById('calendarView').innerHTML=h}
+    function renderWeek(){let start=new Date(cur);start.setDate(start.getDate()-start.getDay()+1);document.getElementById('periodLabel').textContent='Неделя '+fd(start);let dn=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],today=fd(new Date()),h='<div class="week-grid">';for(let i=0;i<7;i++){let d=new Date(start);d.setDate(d.getDate()+i);let ds=fd(d);h+='<div class="day-col"><h4>'+dn[i]+' '+d.getDate()+'</h4>';lessons.filter(l=>gd(l)===ds).forEach(l=>{h+='<div class="lesson-item '+l.status+'"><span onclick="openEdit('+l.id+')">'+gt(l)+' — '+l.student_name+'</span></div>'});h+='<div style="text-align:center;color:var(--gold);cursor:pointer;" onclick="pickDay(\''+ds+'\')">+</div></div>'}h+='</div>';document.getElementById('calendarView').innerHTML=h}
+    function renderDay(){let ds=fd(cur);document.getElementById('periodLabel').textContent=cur.toLocaleString('ru',{weekday:'long',day:'numeric',month:'long'});let day=lessons.filter(l=>gd(l)===ds);let h='<div>';day.forEach(l=>{h+='<div class="lesson-item '+l.status+'"><span onclick="openEdit('+l.id+')">'+gt(l)+' — '+l.student_name+'</span></div>'});h+='</div>';document.getElementById('calendarView').innerHTML=h;pickDay(ds)}
+    function pickDay(ds){sel=ds;document.getElementById('selectedLabel').textContent='📅 '+ds;document.getElementById('addForm').style.display='block';document.getElementById('lessonDT').value=ds+'T15:00';if(view==='month')renderMonth();showLessons(ds)}
+    function showLessons(ds){let day=lessons.filter(l=>gd(l)===ds);document.getElementById('lessonList').innerHTML=day.length?day.map(l=>'<div class="lesson-item '+l.status+'" onclick="openEdit('+l.id+')">'+gt(l)+' — '+l.student_name+'</div>').join(''):'<p>Нет уроков</p>'}
+    function addLesson(){let f=document.createElement('form');f.method='POST';f.action='/calendar/add';let fields={student_id:document.getElementById('studentSelect').value,date_time:document.getElementById('lessonDT').value,price:document.getElementById('lessonPrice').value,topic:document.getElementById('lessonTopic').value,duration:document.getElementById('lessonDur').value,repeat:document.getElementById('lessonRepeat').value,repeat_count:document.getElementById('lessonRepeatCount').value};for(let k in fields){let i=document.createElement('input');i.name=k;i.value=fields[k];f.appendChild(i)}document.body.appendChild(f);f.submit()}
+    function openEdit(id){let l=lessons.find(x=>x.id===id);if(!l)return;document.getElementById('editId').value=l.id;document.getElementById('editDT').value=(l.date_time||'').slice(0,16);document.getElementById('editPrice').value=l.price;document.getElementById('editTopic').value=l.topic||'';document.getElementById('editStatus').value=l.status;document.getElementById('editModal').classList.add('active')}
+    function closeModal(){document.getElementById('editModal').classList.remove('active')}
+    function saveEdit(){let f=document.createElement('form');f.method='POST';f.action='/calendar/edit';['id','date_time','price','status','topic'].forEach(k=>{let i=document.createElement('input');i.name=k;i.value=document.getElementById(k==='id'?'editId':k==='date_time'?'editDT':k==='price'?'editPrice':k==='status'?'editStatus':'editTopic').value;f.appendChild(i)});document.body.appendChild(f);f.submit()}
+    function deleteLesson(){if(confirm('Удалить?'))window.location='/calendar/delete/'+document.getElementById('editId').value}
+    render();
+  </script>
+</body>
+</html>

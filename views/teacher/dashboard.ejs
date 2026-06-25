@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="<%= user.theme %>">
+<head>
+  <meta charset="UTF-8"><title>Главная | Журнал репетитора</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin-bottom: 25px; }
+    .card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 8px; }
+    .card .num { font-size: 32px; font-weight: 700; } .green { color: var(--green); } .gold { color: var(--gold); } .blue { color: var(--blue); } .red { color: var(--red); }
+    .card .sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .panel h3 { font-size: 16px; margin-bottom: 15px; }
+    .next { border-left: 4px solid var(--gold); padding-left: 15px; }
+    .next .name { font-weight: 600; font-size: 16px; } .next .info { color: var(--text2); font-size: 13px; margin: 4px 0; }
+    .btns { display: flex; gap: 8px; margin-top: 12px; }
+    .sub-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; } .dot-red { background: var(--red); } .dot-yellow { background: var(--yellow); }
+    .schedule-table { width: 100%; } .schedule-table tr { border-bottom: 1px solid var(--border); }
+    .schedule-table td { padding: 10px 8px; font-size: 13px; } .schedule-table .time { font-weight: 700; }
+    .status { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .status-done { background: #E8F5E9; color: var(--green); } .status-wait { background: #FFF8E1; color: var(--yellow); }
+    .note-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .note-del { color: var(--red); text-decoration: none; }
+    .greeting { display: flex; justify-content: space-between; margin-bottom: 25px; }
+    .greeting h1 { font-size: 24px; } .greeting .date { color: var(--text2); font-size: 14px; }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2,1fr); } .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="header"><div class="logo">📚 <span>ЖУРНАЛ</span> РЕПЕТИТОРА</div><div class="header-right"><span class="badge">👑 Премиум</span><div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div><span style="font-weight:600;font-size:14px;"><%= user.name %></span><a href="/theme/<%= user.theme==='dark'?'light':'dark' %>" style="color:var(--text2);text-decoration:none;"><%= user.theme==='dark'?'☀️':'🌙' %></a><a href="/logout" class="logout">🚪</a></div></div>
+  <div class="menu"><a href="/dashboard" class="active">🏠 Главная</a><a href="/calendar">📅 Расписание</a><a href="/students">👨‍🎓 Ученики</a><a href="/groups">👥 Группы</a><a href="/finances">💰 Финансы</a><a href="/library">📚 Библиотека</a><a href="/analytics">📊 Аналитика</a><a href="/templates">📋 Шаблоны</a><a href="/settings">⚙️ Настройки</a></div>
+  <div class="content">
+    <div class="greeting"><div><h1>👋 Добрый день, <%= user.name %>!</h1><div style="color:var(--text2);font-size:14px;">Сегодня <%= todayLessons.length %> занятий.</div></div><div class="date">📅 <%= new Date().toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) %></div></div>
+    <div class="cards"><div class="card"><div class="label">📅 Занятий сегодня</div><div class="num blue"><%= todayLessons.length %></div></div><div class="card"><div class="label">👨‍🎓 Учеников</div><div class="num gold"><%= totalStudents %></div></div><div class="card"><div class="label">💰 Доход за месяц</div><div class="num green"><%= Number(totalIncome).toLocaleString() %> <%= user.currency||'BYN' %></div></div><div class="card"><div class="label">📝 Ждут проверки</div><div class="num red"><%= pendingCount %></div></div></div>
+    <div class="grid2">
+      <div class="panel"><h3>⏰ Следующий урок</h3><% if(nextLesson){%><div class="next"><p><strong style="font-size:18px;"><%=(nextLesson.date_time||'').slice(11,16)%></strong></p><p class="name"><%= nextLesson.student_name %></p><p class="info"><%= nextLesson.subj||'—' %> | <%= nextLesson.lvl||'' %></p><div class="btns"><a href="/calendar/conduct/<%= nextLesson.id %>" class="btn btn-green">✅ Провести</a><button class="btn btn-outline" onclick="editLesson(<%= nextLesson.id %>)">📅 Перенести</button><a href="/calendar/status/<%= nextLesson.id %>/cancelled" class="btn btn-outline-red">✕ Отменить</a></div></div><%}else{%><p style="color:var(--text2);">Нет уроков</p><%}%></div>
+      <div class="panel"><h3>⚠️ Заканчивается срок</h3><% if(expiringSubs.length===0){%><p style="color:var(--text2);">Всё хорошо</p><%}%><% expiringSubs.forEach(function(s){%><div class="sub-item"><span><span class="dot <%= s.lessons_left===1?'dot-red':'dot-yellow' %>"></span><strong><%= s.student_name %></strong> — <%= s.lessons_left %> занят.</span><a href="/subscriptions" class="btn btn-outline" style="font-size:11px;">▶️</a></div><%})%></div>
+    </div>
+    <div class="panel"><h3>📅 Расписание на сегодня</h3><% if(todayLessons.length===0){%><p style="color:var(--text2);">Нет занятий</p><%}else{%><table class="schedule-table"><% todayLessons.forEach(function(l){%><tr><td class="time"><%=(l.date_time||'').slice(11,16)%></td><td><strong><%= l.student_name %></strong></td><td><%= l.subj||'—' %></td><td><% if(l.status==='paid'||l.status==='done'){%><span class="status status-done">✅</span><%}else{%><span class="status status-wait">🟡</span><%}%></td></tr><%})%></table><%}%><a href="/calendar/add" class="btn btn-outline" style="margin-top:12px;">➕ Создать занятие</a></div>
+    <div class="grid2">
+      <div class="panel"><h3>📝 Быстрые заметки</h3><form action="/notes/add" method="POST"><input type="text" name="text" placeholder="Новая заметка..." style="width:100%;padding:8px;margin-bottom:8px;"><button class="btn btn-outline" style="width:100%;">Добавить</button></form><% notes.forEach(function(n){%><div class="note-item"><span><%= n.text %></span><a href="/notes/delete/<%= n.id %>" class="note-del">✕</a></div><%})%></div>
+      <div class="panel"><h3>⚡ Быстрые действия</h3><a href="/students/create" class="btn btn-outline" style="display:block;margin-bottom:8px;text-align:center;">➕ Ученик</a><a href="/calendar/add" class="btn btn-outline" style="display:block;margin-bottom:8px;text-align:center;">📅 Занятие</a><a href="/finances" class="btn btn-outline" style="display:block;margin-bottom:8px;text-align:center;">💰 Доход/Расход</a><a href="/backup" class="btn btn-outline" style="display:block;text-align:center;">💾 Бекап</a></div>
+    </div>
+  </div>
+  <script>function editLesson(id){let d=prompt('Новая дата и время (ГГГГ-ММ-ДДTЧЧ:ММ):','');if(d)window.location='/calendar/edit-date/'+id+'?date='+encodeURIComponent(d);}</script>
+</body>
+</html>
